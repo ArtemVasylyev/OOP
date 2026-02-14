@@ -38,7 +38,7 @@ class Program
             Console.WriteLine($"Результат обчислення: {result}");
         }
         
-        Console.ReadKey();
+        Console.ReadLine();
     }
 
     static double GetDoubleInput(string message)
