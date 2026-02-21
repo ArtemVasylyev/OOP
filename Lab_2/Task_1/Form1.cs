@@ -2,108 +2,101 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace AddressApp
+namespace ShapesApp
 {
     public partial class Form1 : Form
     {
-        private PostalAddress currentAddress;
+        private Shape currentShape;
 
-        private TextBox txtCountry, txtCity, txtStreet, txtBuilding, txtZipCode;
-        private Button btnCreate, btnUpdate, btnDestroy;
-        private Label lblResult, lblCounter;
+        private PictureBox pbCanvas;
+        private Label lblInfo;
+        private Button btnRect, btnSquare, btnCircle;
+        private Button btnMove, btnResize, btnShrink, btnRotate; 
 
         public Form1()
         {
-            InitializeUI(); 
-            UpdateCounterLabel();
+            InitializeUI();
         }
-
 
         private void InitializeUI()
         {
-            this.Text = "Поштова Адреса";
-            this.Size = new Size(400, 450);
+            this.Text = "Геометричні фігури";
+
+            this.Size = new Size(650, 550); 
             this.StartPosition = FormStartPosition.CenterScreen;
 
             int y = 20;
-            this.Controls.Add(new Label() { Text = "Країна:", Location = new Point(20, y), AutoSize = true });
-            txtCountry = new TextBox() { Location = new Point(120, y), Text = "Україна", Width = 200 };
-            this.Controls.Add(txtCountry);
+            Label lbl1 = new Label() { Text = "Створення:", Location = new Point(20, y), AutoSize = true, Font = new Font("Arial", 10, FontStyle.Bold) };
+            this.Controls.Add(lbl1);
+
 
             y += 30;
-            this.Controls.Add(new Label() { Text = "Місто:", Location = new Point(20, y), AutoSize = true });
-            txtCity = new TextBox() { Location = new Point(120, y), Text = "Київ", Width = 200 };
-            this.Controls.Add(txtCity);
+            btnRect = new Button() { Text = "Прямокутник", Location = new Point(20, y), Size = new Size(140, 35) };
+            btnRect.Click += (s, e) => { currentShape = new MyRectangle(200, 200, 100, 60); UpdateCanvas(); };
+            this.Controls.Add(btnRect);
+
+            y += 45;
+            btnSquare = new Button() { Text = "Квадрат", Location = new Point(20, y), Size = new Size(140, 35) };
+            btnSquare.Click += (s, e) => { currentShape = new MySquare(200, 200, 80); UpdateCanvas(); };
+            this.Controls.Add(btnSquare);
+
+            y += 45;
+            btnCircle = new Button() { Text = "Коло", Location = new Point(20, y), Size = new Size(140, 35) };
+            btnCircle.Click += (s, e) => { currentShape = new MyCircle(200, 200, 50); UpdateCanvas(); };
+            this.Controls.Add(btnCircle);
+
+            y += 55;
+            Label lbl2 = new Label() { Text = "Дії:", Location = new Point(20, y), AutoSize = true, Font = new Font("Arial", 10, FontStyle.Bold) };
+            this.Controls.Add(lbl2);
 
             y += 30;
-            this.Controls.Add(new Label() { Text = "Вулиця:", Location = new Point(20, y), AutoSize = true });
-            txtStreet = new TextBox() { Location = new Point(120, y), Text = "Хрещатик", Width = 200 };
-            this.Controls.Add(txtStreet);
+            btnMove = new Button() { Text = "Перемістити", Location = new Point(20, y), Size = new Size(140, 35) };
+            btnMove.Click += (s, e) => { currentShape?.Move(15, 15); UpdateCanvas(); }; 
+            this.Controls.Add(btnMove);
 
-            y += 30;
-            this.Controls.Add(new Label() { Text = "Будинок:", Location = new Point(20, y), AutoSize = true });
-            txtBuilding = new TextBox() { Location = new Point(120, y), Text = "1", Width = 200 };
-            this.Controls.Add(txtBuilding);
+            y += 45;
+            btnResize = new Button() { Text = "Збільшити", Location = new Point(20, y), Size = new Size(140, 35) };
+            btnResize.Click += (s, e) => { currentShape?.Resize(1.2f); UpdateCanvas(); }; // Коефіцієнт > 1 збільшує
+            this.Controls.Add(btnResize);
 
-            y += 30;
-            this.Controls.Add(new Label() { Text = "Індекс:", Location = new Point(20, y), AutoSize = true });
-            txtZipCode = new TextBox() { Location = new Point(120, y), Text = "01001", Width = 200 };
-            this.Controls.Add(txtZipCode);
+            y += 45;
+            btnShrink = new Button() { Text = "Зменшити", Location = new Point(20, y), Size = new Size(140, 35) };
+            btnShrink.Click += (s, e) => { currentShape?.Resize(0.8f); UpdateCanvas(); }; // Коефіцієнт < 1 зменшує
+            this.Controls.Add(btnShrink);
 
-            y += 40;
-            btnCreate = new Button() { Text = "Створити", Location = new Point(20, y), Width = 100 };
-            btnCreate.Click += btnCreate_Click;
-            this.Controls.Add(btnCreate);
+            y += 45;
+            btnRotate = new Button() { Text = "Повернути", Location = new Point(20, y), Size = new Size(140, 35) };
+            btnRotate.Click += (s, e) => { currentShape?.Rotate(15); UpdateCanvas(); };
+            this.Controls.Add(btnRotate);
 
-            btnUpdate = new Button() { Text = "Змінити", Location = new Point(130, y), Width = 100 };
-            btnUpdate.Click += btnUpdate_Click;
-            this.Controls.Add(btnUpdate);
+            y += 55;
+            lblInfo = new Label() { Text = "Інформація:\n-", Location = new Point(20, y), Size = new Size(140, 100) };
+            this.Controls.Add(lblInfo);
 
-            btnDestroy = new Button() { Text = "Знищити", Location = new Point(240, y), Width = 100 };
-            btnDestroy.Click += btnDestroy_Click;
-            this.Controls.Add(btnDestroy);
-
-            y += 40;
-            lblResult = new Label() { Text = "Поточна адреса:\n-", Location = new Point(20, y), Size = new Size(340, 60) };
-            this.Controls.Add(lblResult);
-
-            y += 70;
-            lblCounter = new Label() { Text = "Активних адрес: 0", Location = new Point(20, y), AutoSize = true, ForeColor = Color.Blue };
-            this.Controls.Add(lblCounter);
+            pbCanvas = new PictureBox() 
+            { 
+                Location = new Point(180, 20), 
+                Size = new Size(430, 430), 
+                BackColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle
+            };
+            pbCanvas.Paint += PbCanvas_Paint; 
+            this.Controls.Add(pbCanvas);
         }
 
-        private void UpdateCounterLabel()
+        private void UpdateCanvas()
         {
-            lblCounter.Text = $"Активних адрес у пам'яті: {PostalAddress.ActiveAddressesCount}";
-        }
-
-        private void btnCreate_Click(object sender, EventArgs e)
-        {
-            currentAddress = new PostalAddress(txtCountry.Text, txtCity.Text, txtStreet.Text, txtBuilding.Text, txtZipCode.Text);
-            lblResult.Text = "Поточна адреса:\n" + currentAddress.ToString();
-            UpdateCounterLabel();
-        }
-
-        private void btnUpdate_Click(object sender, EventArgs e)
-        {
-            if (currentAddress != null)
+            if (currentShape != null)
             {
-                currentAddress.UpdateAddress(txtStreet.Text, txtBuilding.Text);
-                lblResult.Text = "Оновлена адреса:\n" + currentAddress.ToString();
+                lblInfo.Text = currentShape.GetInfo() + $"\nВсього фігур: {Shape.TotalShapesCount}";
             }
-            else MessageBox.Show("Спочатку створіть адресу!");
+            pbCanvas.Invalidate(); 
         }
 
-        private void btnDestroy_Click(object sender, EventArgs e)
+        private void PbCanvas_Paint(object sender, PaintEventArgs e)
         {
-            if (currentAddress != null)
-            {
-                currentAddress = null;
-                lblResult.Text = "Об'єкт адреси видалено з посилання.";
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                UpdateCounterLabel();
-            }
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            currentShape?.Draw(e.Graphics);
         }
     }
 }
