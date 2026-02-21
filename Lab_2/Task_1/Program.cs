@@ -1,6 +1,6 @@
 using System;
 using System.Windows.Forms;
-using AddressApp; 
+using ShapesApp; 
 
 namespace Task_1
 {
@@ -11,7 +11,7 @@ namespace Task_1
         {
             ApplicationConfiguration.Initialize();
 
-            Application.Run(new AddressApp.Form1()); 
+            Application.Run(new ShapesApp.Form1()); 
         }
     }
 }
