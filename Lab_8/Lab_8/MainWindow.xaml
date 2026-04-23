@@ -1,0 +1,35 @@
+﻿<Window x:Class="Lab08_WPF_Editor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="WPF Редактор" Height="450" Width="800">
+    <DockPanel>
+        <ToolBar DockPanel.Dock="Top" Background="#F0F0F0">
+            <Button Name="btnNew" Click="NewWindow_Click">📄 Нове вікно</Button>
+            <Separator/>
+            <Button Command="ApplicationCommands.Open">📂 Відкрити</Button>
+            <Button Command="ApplicationCommands.Save">💾 Зберегти</Button>
+            <Separator/>
+
+            <ToggleButton Command="EditingCommands.ToggleBold" FontWeight="Bold">B</ToggleButton>
+            <ToggleButton Command="EditingCommands.ToggleItalic" FontStyle="Italic">I</ToggleButton>
+            <ToggleButton Command="EditingCommands.ToggleUnderline">
+                <Underline>U</Underline>
+            </ToggleButton>
+            <Separator/>
+
+            <Button Command="EditingCommands.AlignLeft">Вліво</Button>
+            <Button Command="EditingCommands.AlignCenter">По центру</Button>
+            <Button Command="EditingCommands.AlignRight">Вправо</Button>
+            <Separator/>
+
+            <ComboBox Name="cmbFontFamily" Width="150" SelectionChanged="cmbFontFamily_SelectionChanged" />
+            <ComboBox Name="cmbFontSize" Width="50" IsEditable="True" TextBoxBase.TextChanged="cmbFontSize_TextChanged" />
+            <Separator/>
+
+            <Button Name="btnImage" Click="InsertImage_Click">🖼 Картинка</Button>
+            <Button Name="btnLang" Click="ChangeLang_Click">🌐 Мова</Button>
+        </ToolBar>
+
+        <RichTextBox Name="rtbEditor" SelectionChanged="rtbEditor_SelectionChanged" Margin="5" />
+    </DockPanel>
+</Window>
