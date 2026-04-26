@@ -213,6 +213,10 @@ namespace Lab_17
             do
             {
                 bytes = Stream.Read(data, 0, data.Length);
+                if (bytes == 0)
+                {
+                    throw new Exception("Disconect");
+                }
                 builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
             }
             while (Stream.DataAvailable);
